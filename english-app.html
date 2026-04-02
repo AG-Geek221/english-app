@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>OwlEnglish – Apprendre l'Anglais</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#58CC02;--green-dk:#46A302;--green-lt:#D7F5B1;
+  --blue:#1CB0F6;--blue-dk:#1899D6;--blue-lt:#DDF4FF;
+  --red:#FF4B4B;--red-dk:#D93636;--red-lt:#FFE0E0;
+  --yellow:#FFC800;--yellow-dk:#E6A800;--yellow-lt:#FFF3CC;
+  --purple:#CE82FF;--purple-dk:#9747FF;--purple-lt:#F3E6FF;
+  --orange:#FF9600;--orange-lt:#FFF0D9;
+  --bg:#F7F7F7;--white:#FFFFFF;
+  --text:#3C3C3C;--text2:#777;--text3:#AAA;
+  --border:#E5E5E5;
+  --font:'Nunito',sans-serif;--font-title:'Fredoka One',cursive;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--text);overflow:hidden}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;transition:transform .3s ease,opacity .3s ease}
+.screen.off{transform:translateX(100%);opacity:0;pointer-events:none}
+
+/* ── HOME ── */
+#home{background:var(--white)}
+.home-header{background:var(--green);padding:28px 20px 20px;text-align:center;position:relative}
+.owl{font-size:56px;display:block;animation:owlBob 2s ease-in-out infinite}
+@keyframes owlBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.home-title{font-family:var(--font-title);font-size:32px;color:var(--white);letter-spacing:.5px;margin-top:6px}
+.home-sub{color:rgba(255,255,255,.85);font-size:14px;margin-top:4px;font-weight:600}
+.home-stats{display:flex;gap:12px;padding:16px 20px;background:var(--white);border-bottom:2px solid var(--border)}
+.stat-chip{flex:1;background:var(--bg);border-radius:14px;padding:10px 8px;text-align:center;border:2px solid var(--border)}
+.stat-chip .n{font-family:var(--font-title);font-size:22px;color:var(--green)}
+.stat-chip .l{font-size:11px;color:var(--text2);font-weight:700;margin-top:1px}
+.levels-wrap{flex:1;overflow-y:auto;padding:16px 20px 80px;-webkit-overflow-scrolling:touch}
+.level-section{margin-bottom:20px}
+.level-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;margin-bottom:12px;font-weight:800;font-size:14px}
+.level-A1{background:#E8F5E9;color:#2E7D32}
+.level-A2{background:#E3F2FD;color:#1565C0}
+.level-B1{background:#FFF3E0;color:#E65100}
+.level-B2{background:#F3E5F5;color:#6A1B9A}
+.level-badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:800;color:white}
+.bg-A1{background:#4CAF50}.bg-A2{background:#2196F3}.bg-B1{background:#FF9800}.bg-B2{background:#9C27B0}
+.path{display:flex;flex-direction:column;align-items:center;gap:0}
+.path-row{display:flex;justify-content:center;gap:16px;margin-bottom:8px}
+.lesson-node{position:relative;cursor:pointer;transition:transform .15s}
+.lesson-node:active{transform:scale(.93)}
+.node-circle{width:68px;height:68px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid;font-size:24px;transition:all .2s;position:relative}
+.node-done{background:var(--green);border-color:var(--green-dk);box-shadow:0 4px 0 var(--green-dk)}
+.node-active{background:var(--white);border-color:var(--green);box-shadow:0 4px 0 var(--green-dk);animation:nodePulse 1.5s ease-in-out infinite}
+@keyframes nodePulse{0%,100%{box-shadow:0 4px 0 var(--green-dk),0 0 0 0 rgba(88,204,2,.4)}50%{box-shadow:0 4px 0 var(--green-dk),0 0 0 8px rgba(88,204,2,0)}}
+.node-locked{background:#E5E5E5;border-color:#CCC;box-shadow:0 4px 0 #BBB;cursor:not-allowed}
+.node-label{font-size:10px;font-weight:800;color:var(--text2);text-align:center;margin-top:4px;max-width:72px;line-height:1.2}
+.node-stars{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);display:flex;gap:2px;background:var(--white);border-radius:100px;padding:1px 4px;border:1.5px solid var(--border)}
+.star{font-size:8px}
+.node-xp{position:absolute;top:-8px;right:-6px;background:var(--yellow);border:2px solid var(--yellow-dk);border-radius:100px;font-size:9px;font-weight:800;color:var(--text);padding:1px 5px}
+
+/* ── LESSON SCREEN ── */
+#lesson{background:var(--white)}
+.lesson-top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:2px solid var(--border)}
+.btn-close{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+.progress-bar-wrap{flex:1;height:14px;background:var(--border);border-radius:100px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--green);border-radius:100px;transition:width .4s ease}
+.hearts{display:flex;gap:3px;flex-shrink:0}
+.heart{font-size:20px;transition:transform .2s}
+.heart.lost{filter:grayscale(1);transform:scale(.8)}
+.exercise-wrap{flex:1;overflow-y:auto;padding:20px 20px 16px;display:flex;flex-direction:column;gap:16px;-webkit-overflow-scrolling:touch}
+.ex-type-badge{font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+.ex-question{font-size:20px;font-weight:800;color:var(--text);line-height:1.4}
+.ex-question.big{font-size:24px}
+.ex-hint{font-size:13px;color:var(--text2);font-weight:600;margin-top:-6px}
+.character{font-size:60px;text-align:center;margin:8px 0;animation:charBounce .6s ease}
+@keyframes charBounce{0%{transform:scale(0)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+/* QCM */
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice-btn{width:100%;padding:14px 16px;border-radius:16px;border:2.5px solid var(--border);background:var(--white);font-family:var(--font);font-size:16px;font-weight:700;color:var(--text);cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:12px}
+.choice-btn:active{transform:scale(.98)}
+.choice-btn.selected{border-color:var(--blue);background:var(--blue-lt)}
+.choice-btn.correct{border-color:var(--green);background:var(--green-lt);color:var(--green-dk)}
+.choice-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red-dk)}
+.choice-letter{width:28px;height:28px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+
+/* FILL BLANK */
+.sentence-display{font-size:20px;font-weight:700;color:var(--text);line-height:1.8;padding:16px;background:var(--bg);border-radius:16px;border:2px solid var(--border);text-align:center}
+.blank-input{border:none;border-bottom:3px solid var(--blue);background:transparent;font-family:var(--font);font-size:20px;font-weight:700;color:var(--blue);width:140px;text-align:center;outline:none;padding:2px 4px}
+.blank-input.correct{border-bottom-color:var(--green);color:var(--green-dk)}
+.blank-input.wrong{border-bottom-color:var(--red);color:var(--red-dk)}
+.hint-words{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+.hint-word{padding:6px 14px;border-radius:10px;background:var(--yellow-lt);border:2px solid var(--yellow-dk);font-size:14px;font-weight:700;color:var(--text);cursor:pointer}
+.hint-word:active{transform:scale(.95)}
+
+/* WORD ORDER */
+.word-slots{display:flex;flex-wrap:wrap;gap:8px;min-height:54px;padding:12px;background:var(--bg);border:2px dashed var(--border);border-radius:16px;align-items:center}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px;justify-content:center}
+.word-chip{padding:10px 16px;border-radius:12px;background:var(--white);border:2.5px solid var(--border);font-family:var(--font);font-size:15px;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;user-select:none;box-shadow:0 3px 0 var(--border)}
+.word-chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--border)}
+.word-chip.placed{background:var(--blue-lt);border-color:var(--blue);color:var(--blue-dk);box-shadow:0 3px 0 var(--blue)}
+.word-chip.disabled{opacity:.4;cursor:default}
+.word-chip.correct-chip{background:var(--green-lt);border-color:var(--green);color:var(--green-dk)}
+.word-chip.wrong-chip{background:var(--red-lt);border-color:var(--red);color:var(--red-dk)}
+
+/* PAIRS */
+.pairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair-btn{padding:12px 10px;border-radius:14px;border:2.5px solid var(--border);background:var(--white);font-family:var(--font);font-size:14px;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;text-align:center}
+.pair-btn:active{transform:scale(.96)}
+.pair-btn.sel-left{background:var(--purple-lt);border-color:var(--purple-dk)}
+.pair-btn.sel-right{background:var(--blue-lt);border-color:var(--blue)}
+.pair-btn.matched{background:var(--green-lt);border-color:var(--green);color:var(--green-dk);cursor:default}
+.pair-btn.wrong-flash{background:var(--red-lt);border-color:var(--red)}
+
+/* TRANSLATION INPUT */
+.trans-input{width:100%;padding:14px 16px;border-radius:16px;border:2.5px solid var(--border);font-family:var(--font);font-size:17px;font-weight:700;color:var(--text);outline:none;resize:none;min-height:80px;transition:border-color .2s}
+.trans-input:focus{border-color:var(--blue)}
+.trans-input.correct{border-color:var(--green);background:var(--green-lt)}
+.trans-input.wrong{border-color:var(--red);background:var(--red-lt)}
+
+/* FEEDBACK BAR */
+.feedback-bar{padding:16px 20px calc(var(--safe-b) + 16px);border-top:3px solid;display:flex;flex-direction:column;gap:6px;flex-shrink:0;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.fb-correct{background:var(--green-lt);border-color:var(--green)}
+.fb-wrong{background:var(--red-lt);border-color:var(--red)}
+.fb-title{font-size:17px;font-weight:900;display:flex;align-items:center;gap:8px}
+.fb-correct .fb-title{color:var(--green-dk)}
+.fb-wrong .fb-title{color:var(--red-dk)}
+.fb-answer{font-size:14px;font-weight:700;color:var(--text2)}
+.btn-continue{margin-top:4px;padding:14px;border-radius:14px;border:none;font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:transform .1s,box-shadow .1s;width:100%}
+.btn-continue:active{transform:translateY(2px);box-shadow:none!important}
+.fb-correct .btn-continue{background:var(--green);color:white;box-shadow:0 4px 0 var(--green-dk)}
+.fb-wrong .btn-continue{background:var(--red);color:white;box-shadow:0 4px 0 var(--red-dk)}
+.check-btn-wrap{padding:0 20px 16px;flex-shrink:0}
+.btn-check{width:100%;padding:16px;border-radius:16px;border:none;background:var(--border);font-family:var(--font);font-size:17px;font-weight:800;color:var(--text3);cursor:pointer;transition:all .2s}
+.btn-check.ready{background:var(--green);color:white;box-shadow:0 4px 0 var(--green-dk)}
+.btn-check.ready:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-dk)}
+
+/* ── COMPLETE SCREEN ── */
+#complete{background:linear-gradient(160deg,#58CC02 0%,#1CB0F6 100%)}
+.complete-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:20px;text-align:center}
+.trophy{font-size:80px;animation:tropheeBounce .6s ease}
+@keyframes tropheeBounce{0%{transform:scale(0) rotate(-15deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0deg)}}
+.complete-title{font-family:var(--font-title);font-size:36px;color:white}
+.complete-sub{font-size:16px;color:rgba(255,255,255,.9);font-weight:700}
+.complete-stats{display:flex;gap:16px;width:100%}
+.c-stat{flex:1;background:rgba(255,255,255,.2);border-radius:16px;padding:14px 10px;color:white}
+.c-stat .n{font-family:var(--font-title);font-size:28px}
+.c-stat .l{font-size:12px;font-weight:700;opacity:.85;margin-top:2px}
+.btn-home{padding:16px 40px;border-radius:16px;border:none;background:white;font-family:var(--font);font-size:17px;font-weight:800;color:var(--green);cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.btn-home:active{transform:translateY(3px);box-shadow:none}
+
+/* ── BADGES POPUP ── */
+.badge-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:white;border-radius:24px;padding:28px 32px;text-align:center;z-index:999;box-shadow:0 20px 60px rgba(0,0,0,.25);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.badge-popup.show{transform:translate(-50%,-50%) scale(1)}
+.badge-icon{font-size:64px;display:block;margin-bottom:12px}
+.badge-name{font-family:var(--font-title);font-size:24px;color:var(--text)}
+.badge-desc{font-size:14px;color:var(--text2);font-weight:600;margin-top:4px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+
+/* ── FLASH ── */
+.flash{position:fixed;inset:0;pointer-events:none;z-index:1000;opacity:0;transition:opacity .1s}
+.flash.green{background:rgba(88,204,2,.2)}
+.flash.red{background:rgba(255,75,75,.2)}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(56px + var(--safe-b));background:white;border-top:2px solid var(--border);display:flex;z-index:10}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-bottom:var(--safe-b);border:none;background:none;font-family:var(--font)}
+.nav-btn .icon{font-size:22px}
+.nav-btn .label{font-size:10px;font-weight:800;color:var(--text3)}
+.nav-btn.active .label{color:var(--green)}
+.nav-btn.active .icon{filter:none}
+
+/* ── PROFILE SCREEN ── */
+#profile{background:var(--white)}
+.profile-header{background:var(--green);padding:32px 20px 24px;text-align:center}
+.avatar{font-size:64px;width:88px;height:88px;background:rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;border:4px solid white}
+.profile-name{font-family:var(--font-title);font-size:26px;color:white}
+.profile-level{font-size:13px;color:rgba(255,255,255,.85);font-weight:700;margin-top:4px}
+.profile-body{flex:1;overflow-y:auto;padding:16px 20px 80px}
+.profile-section-title{font-size:13px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 10px}
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.badge-card{background:var(--bg);border-radius:14px;padding:10px 6px;text-align:center;border:2px solid var(--border)}
+.badge-card .bi{font-size:28px;filter:grayscale(1);opacity:.3}
+.badge-card.earned .bi{filter:none;opacity:1}
+.badge-card .bt{font-size:9px;font-weight:800;color:var(--text3);margin-top:4px;line-height:1.2}
+.streak-fire{font-size:48px;text-align:center;display:block}
+.streak-count{font-family:var(--font-title);font-size:42px;text-align:center;color:var(--orange)}
+.streak-label{text-align:center;font-size:13px;font-weight:700;color:var(--text2);margin-top:2px}
+
+/* ── XP BURST ── */
+.xp-burst{position:fixed;font-family:var(--font-title);font-size:24px;color:var(--yellow);pointer-events:none;z-index:1001;animation:xpFloat 1s ease forwards}
+@keyframes xpFloat{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-80px);opacity:0}}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- FLASH OVERLAY -->
+<div class="flash" id="flash"></div>
+<div class="overlay" id="overlay" onclick="closeBadge()"></div>
+<div class="badge-popup" id="badgePopup">
+  <span class="badge-icon" id="badgeIcon"></span>
+  <div class="badge-name" id="badgeName"></div>
+  <div class="badge-desc" id="badgeDesc"></div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div class="screen" id="home">
+  <div class="home-header">
+    <span class="owl">🦉</span>
+    <div class="home-title">OwlEnglish</div>
+    <div class="home-sub">Apprends l'anglais avec fun !</div>
+  </div>
+  <div class="home-stats" id="homeStats"></div>
+  <div class="levels-wrap" id="levelsWrap"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="showScreen('home')"><span class="icon">🏠</span><span class="label">Cours</span></button>
+    <button class="nav-btn" onclick="showScreen('profile')"><span class="icon">👤</span><span class="label">Profil</span></button>
+  </div>
+</div>
+
+<!-- ══ LESSON ══ -->
+<div class="screen off" id="lesson">
+  <div class="lesson-top">
+    <div class="btn-close" onclick="closeLesson()">✕</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="hearts" id="heartsDisplay"></div>
+  </div>
+  <div class="exercise-wrap" id="exerciseWrap"></div>
+  <div class="check-btn-wrap" id="checkWrap">
+    <button class="btn-check" id="checkBtn" onclick="checkAnswer()">VÉRIFIER</button>
+  </div>
+  <div class="feedback-bar" id="feedbackBar" style="display:none"></div>
+</div>
+
+<!-- ══ COMPLETE ══ -->
+<div class="screen off" id="complete">
+  <div class="complete-inner">
+    <div class="trophy" id="trophyEmoji">🏆</div>
+    <div class="complete-title" id="completeTitle">Leçon terminée !</div>
+    <div class="complete-sub" id="completeSub"></div>
+    <div class="complete-stats" id="completeStats"></div>
+    <button class="btn-home" onclick="finishLesson()">Continuer →</button>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="screen off" id="profile">
+  <div class="profile-header">
+    <div class="avatar">🦉</div>
+    <div class="profile-name">Mon Profil</div>
+    <div class="profile-level" id="profileLevel"></div>
+  </div>
+  <div class="profile-body" id="profileBody"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('home')"><span class="icon">🏠</span><span class="label">Cours</span></button>
+    <button class="nav-btn active" onclick="showScreen('profile')"><span class="icon">👤</span><span class="label">Profil</span></button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA — 30 LEÇONS
+// ════════════════════════════════════════
+const LESSONS = [
+// ── A1 ──
+{id:0,level:'A1',emoji:'👋',title:'Salutations',exercises:[
+  {type:'qcm',q:'Comment dit-on "Bonjour" en anglais ?',choices:['Hello','Goodbye','Please','Sorry'],answer:0,char:'😊'},
+  {type:'qcm',q:'Que veut dire "How are you?" ?',choices:['Comment vous appelez-vous ?','Comment allez-vous ?','Où habitez-vous ?','Quel âge avez-vous ?'],answer:1,char:'🤔'},
+  {type:'fill',q:'Complète la phrase : "My ___ is Sophie."',blank:'name',hint:'prénom',hints:['name','age','phone','job']},
+  {type:'pairs',q:'Associe les salutations !',pairs:[['Hello','Bonjour'],['Goodbye','Au revoir'],['Please','S\'il vous plaît'],['Thank you','Merci']]},
+  {type:'order',q:'Remets les mots dans l\'ordre :',words:['My','name','is','Thomas'],answer:'My name is Thomas',fr:'Je m\'appelle Thomas'},
+  {type:'translate',q:'Traduis en anglais : "Bonne nuit"',answer:'good night',alt:['goodnight'],char:'🌙'}
+]},
+{id:1,level:'A1',emoji:'🔢',title:'Les chiffres',exercises:[
+  {type:'qcm',q:'Comment dit-on "cinq" en anglais ?',choices:['Four','Five','Six','Seven'],answer:1,char:'5️⃣'},
+  {type:'fill',q:'___ + two = five',blank:'Three',hint:'nombre',hints:['Three','Four','One','Two']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['I','am','twenty','years','old'],answer:'I am twenty years old',fr:'J\'ai vingt ans'},
+  {type:'pairs',q:'Associe les chiffres !',pairs:[['One','Un'],['Three','Trois'],['Eight','Huit'],['Ten','Dix']]},
+  {type:'qcm',q:'Combien font "twelve + three" ?',choices:['Fourteen','Fifteen','Sixteen','Thirteen'],answer:1,char:'🔢'},
+  {type:'translate',q:'Traduis en anglais : "J\'ai trente ans"',answer:'I am thirty years old',alt:['i am 30 years old','i\'m thirty years old'],char:'🎂'}
+]},
+{id:2,level:'A1',emoji:'🎨',title:'Les couleurs',exercises:[
+  {type:'qcm',q:'Que signifie "The sky is blue" ?',choices:['Le ciel est vert','Le ciel est bleu','La mer est bleue','La nuit est noire'],answer:1,char:'☁️'},
+  {type:'fill',q:'Roses are ___, violets are blue.',blank:'red',hint:'couleur',hints:['red','pink','green','white']},
+  {type:'pairs',q:'Associe les couleurs !',pairs:[['Red','Rouge'],['Yellow','Jaune'],['Black','Noir'],['White','Blanc']]},
+  {type:'order',q:'Remets dans l\'ordre :',words:['My','car','is','green'],answer:'My car is green',fr:'Ma voiture est verte'},
+  {type:'qcm',q:'"Orange" en anglais se dit ?',choices:['Purple','Orange','Brown','Grey'],answer:1,char:'🟠'},
+  {type:'translate',q:'Traduis : "Le chat noir"',answer:'the black cat',alt:['a black cat'],char:'🐱'}
+]},
+{id:3,level:'A1',emoji:'👨‍👩‍👧',title:'La famille',exercises:[
+  {type:'qcm',q:'"Mother" signifie ?',choices:['Sœur','Mère','Tante','Grand-mère'],answer:1,char:'👩'},
+  {type:'pairs',q:'Associe les membres de la famille !',pairs:[['Father','Père'],['Brother','Frère'],['Sister','Sœur'],['Son','Fils']]},
+  {type:'fill',q:'My ___ is my mother\'s mother.',blank:'grandmother',hint:'qui est-ce ?',hints:['grandmother','aunt','sister','cousin']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['I','have','two','sisters'],answer:'I have two sisters',fr:'J\'ai deux sœurs'},
+  {type:'qcm',q:'"I have a brother" signifie ?',choices:['J\'ai une sœur','J\'ai un cousin','J\'ai un frère','J\'ai un fils'],answer:2,char:'👦'},
+  {type:'translate',q:'Traduis : "Mon père est médecin"',answer:'my father is a doctor',alt:['my father is doctor'],char:'👨‍⚕️'}
+]},
+{id:4,level:'A1',emoji:'🍎',title:'La nourriture',exercises:[
+  {type:'qcm',q:'Que signifie "I am hungry" ?',choices:['J\'ai soif','J\'ai faim','Je suis fatigué','Je suis malade'],answer:1,char:'😋'},
+  {type:'pairs',q:'Associe les aliments !',pairs:[['Apple','Pomme'],['Bread','Pain'],['Milk','Lait'],['Egg','Œuf']]},
+  {type:'fill',q:'I drink ___ every morning.',blank:'coffee',hint:'boisson chaude',hints:['coffee','water','tea','juice']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['She','likes','pizza','and','pasta'],answer:'She likes pizza and pasta',fr:'Elle aime la pizza et les pâtes'},
+  {type:'qcm',q:'"Water" signifie ?',choices:['Jus','Lait','Eau','Thé'],answer:2,char:'💧'},
+  {type:'translate',q:'Traduis : "Je veux une pomme"',answer:'I want an apple',alt:['i would like an apple'],char:'🍎'}
+]},
+{id:5,level:'A1',emoji:'🏠',title:'La maison',exercises:[
+  {type:'qcm',q:'"Kitchen" signifie ?',choices:['Salon','Chambre','Cuisine','Salle de bain'],answer:2,char:'🍳'},
+  {type:'pairs',q:'Associe les pièces !',pairs:[['Bedroom','Chambre'],['Living room','Salon'],['Garden','Jardin'],['Door','Porte']]},
+  {type:'fill',q:'I sleep in my ___.',blank:'bedroom',hint:'pièce',hints:['bedroom','kitchen','garage','bathroom']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['My','house','has','three','bedrooms'],answer:'My house has three bedrooms',fr:'Ma maison a trois chambres'},
+  {type:'qcm',q:'"Window" signifie ?',choices:['Mur','Plancher','Fenêtre','Toit'],answer:2,char:'🪟'},
+  {type:'translate',q:'Traduis : "La salle de bain est grande"',answer:'the bathroom is big',alt:['the bathroom is large'],char:'🛁'}
+]},
+{id:6,level:'A1',emoji:'🐶',title:'Les animaux',exercises:[
+  {type:'qcm',q:'"Cat" signifie ?',choices:['Chien','Chat','Lapin','Oiseau'],answer:1,char:'😺'},
+  {type:'pairs',q:'Associe les animaux !',pairs:[['Dog','Chien'],['Horse','Cheval'],['Fish','Poisson'],['Bird','Oiseau']]},
+  {type:'fill',q:'I have a pet ___. It barks.',blank:'dog',hint:'animal',hints:['dog','cat','fish','snake']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['The','cat','is','on','the','table'],answer:'The cat is on the table',fr:'Le chat est sur la table'},
+  {type:'qcm',q:'"Elephant" en anglais se dit ?',choices:['Éléfant','Elefant','Elephant','Eléphant'],answer:2,char:'🐘'},
+  {type:'translate',q:'Traduis : "Mon chien est petit"',answer:'my dog is small',alt:['my dog is little'],char:'🐕'}
+]},
+{id:7,level:'A1',emoji:'🌤️',title:'La météo',exercises:[
+  {type:'qcm',q:'"It is raining" signifie ?',choices:['Il neige','Il fait soleil','Il pleut','Il fait froid'],answer:2,char:'🌧️'},
+  {type:'pairs',q:'Associe la météo !',pairs:[['Sunny','Ensoleillé'],['Cloudy','Nuageux'],['Windy','Venteux'],['Hot','Chaud']]},
+  {type:'fill',q:'In winter, it often ___.',blank:'snows',hint:'météo',hints:['snows','rains','shines','storms']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Today','the','weather','is','beautiful'],answer:'Today the weather is beautiful',fr:'Aujourd\'hui le temps est beau'},
+  {type:'qcm',q:'"Cold" signifie ?',choices:['Chaud','Froid','Humide','Sec'],answer:1,char:'🥶'},
+  {type:'translate',q:'Traduis : "Il fait très chaud aujourd\'hui"',answer:'it is very hot today',alt:['it\'s very hot today'],char:'☀️'}
+]},
+// ── A2 ──
+{id:8,level:'A2',emoji:'👔',title:'Les vêtements',exercises:[
+  {type:'qcm',q:'"Shoes" signifie ?',choices:['Chaussettes','Chaussures','Chapeau','Ceinture'],answer:1,char:'👟'},
+  {type:'pairs',q:'Associe les vêtements !',pairs:[['Shirt','Chemise'],['Trousers','Pantalon'],['Hat','Chapeau'],['Dress','Robe']]},
+  {type:'fill',q:'She is wearing a beautiful red ___.',blank:'dress',hint:'vêtement',hints:['dress','shoes','hat','gloves']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['He','is','wearing','a','blue','jacket'],answer:'He is wearing a blue jacket',fr:'Il porte une veste bleue'},
+  {type:'qcm',q:'"I need to buy new clothes" signifie ?',choices:['Je dois laver mes habits','J\'ai besoin d\'acheter de nouveaux habits','Je veux vendre mes vêtements','Je porte de nouveaux habits'],answer:1,char:'🛍️'},
+  {type:'translate',q:'Traduis : "Quelles chaussures portes-tu ?"',answer:'what shoes are you wearing',alt:['which shoes are you wearing'],char:'👠'}
+]},
+{id:9,level:'A2',emoji:'🚌',title:'Les transports',exercises:[
+  {type:'qcm',q:'"Train station" signifie ?',choices:['Aéroport','Arrêt de bus','Gare','Port'],answer:2,char:'🚂'},
+  {type:'pairs',q:'Associe les transports !',pairs:[['Bus','Bus'],['Bicycle','Vélo'],['Plane','Avion'],['Ship','Bateau']]},
+  {type:'fill',q:'I go to work by ___.',blank:'bus',hint:'transport',hints:['bus','plane','ship','helicopter']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['The','train','leaves','at','eight','o\'clock'],answer:'The train leaves at eight o\'clock',fr:'Le train part à huit heures'},
+  {type:'qcm',q:'"How long does it take?" signifie ?',choices:['Combien ça coûte ?','Combien de temps faut-il ?','Où est l\'arrêt ?','Quand part-il ?'],answer:1,char:'⏱️'},
+  {type:'translate',q:'Traduis : "Je prends le métro tous les jours"',answer:'I take the subway every day',alt:['i take the metro every day','i take the underground every day'],char:'🚇'}
+]},
+{id:10,level:'A2',emoji:'🏙️',title:'La ville',exercises:[
+  {type:'qcm',q:'"Hospital" signifie ?',choices:['École','Hôpital','Pharmacie','Banque'],answer:1,char:'🏥'},
+  {type:'pairs',q:'Associe les lieux !',pairs:[['School','École'],['Library','Bibliothèque'],['Park','Parc'],['Museum','Musée']]},
+  {type:'fill',q:'Turn left at the ___.',blank:'corner',hint:'direction',hints:['corner','middle','street','bridge']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['The','bank','is','next','to','the','post','office'],answer:'The bank is next to the post office',fr:'La banque est à côté de la poste'},
+  {type:'qcm',q:'"Excuse me, where is the supermarket?" La personne cherche ?',choices:['Une pharmacie','Un restaurant','Un supermarché','Une banque'],answer:2,char:'🛒'},
+  {type:'translate',q:'Traduis : "Tournez à droite après le feu rouge"',answer:'turn right after the traffic light',alt:['turn right at the traffic light'],char:'🚦'}
+]},
+{id:11,level:'A2',emoji:'🛍️',title:'Le shopping',exercises:[
+  {type:'qcm',q:'"How much does it cost?" signifie ?',choices:['Quelle taille ?','C\'est trop cher','Combien ça coûte ?','Avez-vous la monnaie ?'],answer:2,char:'💰'},
+  {type:'pairs',q:'Associe les mots du shopping !',pairs:[['Price','Prix'],['Receipt','Reçu'],['Sale','Soldes'],['Discount','Réduction']]},
+  {type:'fill',q:'Can I pay by credit ___?',blank:'card',hint:'paiement',hints:['card','cash','cheque','phone']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['This','shirt','is','too','expensive'],answer:'This shirt is too expensive',fr:'Cette chemise est trop chère'},
+  {type:'qcm',q:'"I\'d like to try it on" signifie ?',choices:['Je voudrais l\'acheter','Je voudrais l\'essayer','Je voudrais le retourner','Je voudrais un autre'],answer:1,char:'🪞'},
+  {type:'translate',q:'Traduis : "Avez-vous une taille plus grande ?"',answer:'do you have a bigger size',alt:['do you have a larger size'],char:'📏'}
+]},
+{id:12,level:'A2',emoji:'🍽️',title:'Au restaurant',exercises:[
+  {type:'qcm',q:'"Menu" en anglais se dit ?',choices:['List','Menu','Card','Book'],answer:1,char:'📋'},
+  {type:'pairs',q:'Associe le vocabulaire du restaurant !',pairs:[['Waiter','Serveur'],['Bill','Addition'],['Starter','Entrée'],['Tip','Pourboire']]},
+  {type:'fill',q:'I\'d like to ___ a table for two.',blank:'book',hint:'action',hints:['book','get','take','want']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Can','I','have','the','bill','please'],answer:'Can I have the bill please',fr:'Puis-je avoir l\'addition s\'il vous plaît'},
+  {type:'qcm',q:'"I am vegetarian" signifie ?',choices:['Je suis végétalien','Je suis végétarien','Je suis allergique','Je suis au régime'],answer:1,char:'🥗'},
+  {type:'translate',q:'Traduis : "Je voudrais un café et un croissant"',answer:'I would like a coffee and a croissant',alt:['i\'d like a coffee and a croissant'],char:'☕'}
+]},
+{id:13,level:'A2',emoji:'🏥',title:'La santé',exercises:[
+  {type:'qcm',q:'"I have a headache" signifie ?',choices:['J\'ai mal au ventre','J\'ai de la fièvre','J\'ai mal à la tête','Je tousse'],answer:2,char:'🤕'},
+  {type:'pairs',q:'Associe les symptômes !',pairs:[['Fever','Fièvre'],['Cough','Toux'],['Sore throat','Mal de gorge'],['Tired','Fatigué']]},
+  {type:'fill',q:'I need to see a ___.',blank:'doctor',hint:'professionnel',hints:['doctor','teacher','chef','lawyer']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Take','these','pills','twice','a','day'],answer:'Take these pills twice a day',fr:'Prenez ces pilules deux fois par jour'},
+  {type:'qcm',q:'"Call an ambulance!" signifie ?',choices:['Appelez un taxi !','Appelez la police !','Appelez une ambulance !','Appelez un médecin !'],answer:2,char:'🚑'},
+  {type:'translate',q:'Traduis : "Je suis allergique aux cacahuètes"',answer:'I am allergic to peanuts',alt:['i\'m allergic to peanuts'],char:'🥜'}
+]},
+{id:14,level:'A2',emoji:'⚽',title:'Sports & Loisirs',exercises:[
+  {type:'qcm',q:'"I play football" signifie ?',choices:['Je regarde le foot','Je joue au foot','J\'aime le foot','Je comprends le foot'],answer:1,char:'⚽'},
+  {type:'pairs',q:'Associe les sports !',pairs:[['Swimming','Natation'],['Tennis','Tennis'],['Running','Course à pied'],['Cycling','Cyclisme']]},
+  {type:'fill',q:'My favourite ___ is reading.',blank:'hobby',hint:'passe-temps',hints:['hobby','sport','food','colour']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['She','goes','to','the','gym','every','day'],answer:'She goes to the gym every day',fr:'Elle va à la salle de sport tous les jours'},
+  {type:'qcm',q:'"I enjoy hiking" signifie ?',choices:['Je déteste la randonnée','J\'évite la randonnée','J\'apprécie la randonnée','Je fais de la randonnée'],answer:2,char:'🥾'},
+  {type:'translate',q:'Traduis : "Quel est ton sport préféré ?"',answer:'what is your favourite sport',alt:['what is your favorite sport'],char:'🏆'}
+]},
+{id:15,level:'A2',emoji:'💼',title:'Le travail',exercises:[
+  {type:'qcm',q:'"What do you do for a living?" signifie ?',choices:['Où travaillez-vous ?','Quel est votre travail ?','Combien gagnez-vous ?','Vous aimez votre travail ?'],answer:1,char:'💼'},
+  {type:'pairs',q:'Associe les métiers !',pairs:[['Teacher','Enseignant'],['Doctor','Médecin'],['Engineer','Ingénieur'],['Chef','Cuisinier']]},
+  {type:'fill',q:'I work in an ___.',blank:'office',hint:'lieu de travail',hints:['office','farm','garden','mall']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['She','works','for','a','big','company'],answer:'She works for a big company',fr:'Elle travaille pour une grande entreprise'},
+  {type:'qcm',q:'"I got the job!" signifie ?',choices:['J\'ai perdu le poste !','J\'ai obtenu le poste !','J\'ai cherché le poste !','J\'ai quitté le poste !'],answer:1,char:'🎉'},
+  {type:'translate',q:'Traduis : "Je travaille de neuf heures à dix-sept heures"',answer:'I work from nine to five',alt:['i work from 9 to 5','i work nine to five'],char:'⏰'}
+]},
+// ── B1 ──
+{id:16,level:'B1',emoji:'✈️',title:'Voyages',exercises:[
+  {type:'qcm',q:'"I\'d like to book a round-trip ticket" signifie ?',choices:['Je voudrais un billet aller simple','Je voudrais un billet aller-retour','Je voudrais annuler mon billet','Je voudrais changer mon billet'],answer:1,char:'🎫'},
+  {type:'pairs',q:'Associe le vocabulaire voyage !',pairs:[['Passport','Passeport'],['Luggage','Bagages'],['Gate','Porte d\'embarquement'],['Landing','Atterrissage']]},
+  {type:'fill',q:'Please fasten your seat ___.',blank:'belt',hint:'sécurité',hints:['belt','bag','phone','tray']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['My','flight','was','delayed','by','two','hours'],answer:'My flight was delayed by two hours',fr:'Mon vol a été retardé de deux heures'},
+  {type:'qcm',q:'"Jet lag" désigne ?',choices:['Un retard de vol','La fatigue due au décalage horaire','Une peur de l\'avion','Un problème de bagages'],answer:1,char:'😴'},
+  {type:'translate',q:'Traduis : "Avez-vous quelque chose à déclarer à la douane ?"',answer:'do you have anything to declare at customs',alt:['do you have anything to declare'],char:'🛃'}
+]},
+{id:17,level:'B1',emoji:'🌍',title:'Environnement',exercises:[
+  {type:'qcm',q:'"Climate change" signifie ?',choices:['Météo changeante','Changement climatique','Catastrophe naturelle','Pollution de l\'air'],answer:1,char:'🌡️'},
+  {type:'pairs',q:'Associe les mots environnement !',pairs:[['Recycling','Recyclage'],['Pollution','Pollution'],['Forest','Forêt'],['Solar energy','Énergie solaire']]},
+  {type:'fill',q:'We should ___ water to protect the planet.',blank:'save',hint:'action écolo',hints:['save','waste','pollute','ignore']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Global','warming','is','a','serious','problem'],answer:'Global warming is a serious problem',fr:'Le réchauffement climatique est un problème sérieux'},
+  {type:'qcm',q:'"Carbon footprint" désigne ?',choices:['Une empreinte de pied','L\'empreinte carbone','La pollution des sols','Le charbon'],answer:1,char:'👣'},
+  {type:'translate',q:'Traduis : "Nous devons protéger les océans"',answer:'we must protect the oceans',alt:['we need to protect the oceans','we have to protect the oceans'],char:'🌊'}
+]},
+{id:18,level:'B1',emoji:'💻',title:'Technologie',exercises:[
+  {type:'qcm',q:'"Password" signifie ?',choices:['Nom d\'utilisateur','Adresse e-mail','Mot de passe','Numéro de téléphone'],answer:2,char:'🔐'},
+  {type:'pairs',q:'Associe les mots tech !',pairs:[['Download','Télécharger'],['Update','Mise à jour'],['Software','Logiciel'],['Screen','Écran']]},
+  {type:'fill',q:'Can you send me the ___ to the document ?',blank:'link',hint:'partage',hints:['link','photo','name','date']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['My','computer','needs','a','software','update'],answer:'My computer needs a software update',fr:'Mon ordinateur a besoin d\'une mise à jour logicielle'},
+  {type:'qcm',q:'"Artificial intelligence" en français ?',choices:['Intelligence naturelle','Intelligence artificielle','Automatisation','Robotique'],answer:1,char:'🤖'},
+  {type:'translate',q:'Traduis : "Mon téléphone est à court de batterie"',answer:'my phone is running out of battery',alt:['my phone battery is low','my phone has no battery'],char:'🔋'}
+]},
+{id:19,level:'B1',emoji:'🎭',title:'Arts & Culture',exercises:[
+  {type:'qcm',q:'"Exhibition" signifie ?',choices:['Exposition','Représentation','Compétition','Conférence'],answer:0,char:'🖼️'},
+  {type:'pairs',q:'Associe les arts !',pairs:[['Painting','Peinture'],['Sculpture','Sculpture'],['Novel','Roman'],['Orchestra','Orchestre']]},
+  {type:'fill',q:'The film won best ___ at the festival.',blank:'director',hint:'récompense cinéma',hints:['director','actor','music','story']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['I','really','enjoyed','the','concert','last','night'],answer:'I really enjoyed the concert last night',fr:'J\'ai vraiment apprécié le concert hier soir'},
+  {type:'qcm',q:'"Contemporary art" signifie ?',choices:['Art antique','Art moderne','Art contemporain','Art classique'],answer:2,char:'🎨'},
+  {type:'translate',q:'Traduis : "Ce tableau a été peint au dix-neuvième siècle"',answer:'this painting was painted in the nineteenth century',alt:['this painting was made in the 19th century'],char:'🖼️'}
+]},
+{id:20,level:'B1',emoji:'😊',title:'Émotions',exercises:[
+  {type:'qcm',q:'"I am overwhelmed" signifie ?',choices:['Je suis calme','Je suis dépassé/submergé','Je suis confus','Je suis fatigué'],answer:1,char:'😰'},
+  {type:'pairs',q:'Associe les émotions !',pairs:[['Excited','Enthousiaste'],['Anxious','Anxieux'],['Proud','Fier'],['Relieved','Soulagé']]},
+  {type:'fill',q:'She felt ___ when she heard the good news.',blank:'thrilled',hint:'très heureux',hints:['thrilled','bored','nervous','tired']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['I','am','really','proud','of','your','progress'],answer:'I am really proud of your progress',fr:'Je suis vraiment fier de tes progrès'},
+  {type:'qcm',q:'"I\'m homesick" signifie ?',choices:['Je suis malade chez moi','J\'ai le mal du pays','Je suis nostalgique','Je suis perdu'],answer:1,char:'🏡'},
+  {type:'translate',q:'Traduis : "Il est frustrant de ne pas être compris"',answer:'it is frustrating not to be understood',alt:['it\'s frustrating when you\'re not understood'],char:'😤'}
+]},
+{id:21,level:'B1',emoji:'📰',title:'Actualités',exercises:[
+  {type:'qcm',q:'"Breaking news" signifie ?',choices:['Vieilles nouvelles','Informations de dernière minute','Fausses nouvelles','Bonnes nouvelles'],answer:1,char:'📺'},
+  {type:'pairs',q:'Associe le vocabulaire médias !',pairs:[['Headline','Titre',''],['Journalist','Journaliste'],['Report','Reportage'],['Election','Élection']]},
+  {type:'fill',q:'The president gave a speech at the ___ conference.',blank:'press',hint:'type de conférence',hints:['press','cooking','book','music']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['The','government','announced','new','economic','measures'],answer:'The government announced new economic measures',fr:'Le gouvernement a annoncé de nouvelles mesures économiques'},
+  {type:'qcm',q:'"Fake news" signifie ?',choices:['Vieilles nouvelles','Vraies informations','Fausses informations','Petites informations'],answer:2,char:'📰'},
+  {type:'translate',q:'Traduis : "Les élections auront lieu le mois prochain"',answer:'the elections will take place next month',alt:['elections will be held next month'],char:'🗳️'}
+]},
+{id:22,level:'B1',emoji:'🤝',title:'Relations sociales',exercises:[
+  {type:'qcm',q:'"Could you do me a favour?" signifie ?',choices:['Faites-moi confiance','Pourriez-vous me rendre un service ?','M\'accordez-vous du temps ?','Pouvez-vous me rejoindre ?'],answer:1,char:'🙏'},
+  {type:'pairs',q:'Associe les expressions sociales !',pairs:[['Apologise','S\'excuser'],['Compliment','Compliment'],['Argue','Se disputer'],['Compromise','Compromis']]},
+  {type:'fill',q:'Let\'s ___ a meeting for next Monday.',blank:'schedule',hint:'action',hints:['schedule','cancel','miss','avoid']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['I','really','appreciate','your','help','and','support'],answer:'I really appreciate your help and support',fr:'J\'apprécie vraiment ton aide et ton soutien'},
+  {type:'qcm',q:'"Small talk" désigne ?',choices:['Discussion importante','Conversation sans importance','Dispute légère','Conversation secrète'],answer:1,char:'💬'},
+  {type:'translate',q:'Traduis : "Il est important de maintenir le contact avec ses amis"',answer:'it is important to keep in touch with friends',alt:['it\'s important to stay in touch with your friends'],char:'👥'}
+]},
+{id:23,level:'B1',emoji:'🏢',title:'Au bureau',exercises:[
+  {type:'qcm',q:'"Deadline" signifie ?',choices:['Ligne morte','Date limite','Réunion importante','Fin de contrat'],answer:1,char:'📅'},
+  {type:'pairs',q:'Associe le vocabulaire bureau !',pairs:[['Meeting','Réunion'],['Colleague','Collègue'],['Promotion','Promotion'],['Salary','Salaire']]},
+  {type:'fill',q:'Please send me the ___ before the meeting.',blank:'report',hint:'document',hints:['report','lunch','chair','computer']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['We','need','to','discuss','the','project','budget'],answer:'We need to discuss the project budget',fr:'Nous devons discuter du budget du projet'},
+  {type:'qcm',q:'"I\'ve been promoted" signifie ?',choices:['J\'ai été licencié','J\'ai été promu','J\'ai démissionné','J\'ai été muté'],answer:1,char:'📈'},
+  {type:'translate',q:'Traduis : "La réunion a été annulée en raison d\'un conflit d\'horaires"',answer:'the meeting was cancelled due to a scheduling conflict',alt:['the meeting was canceled because of a schedule conflict'],char:'❌'}
+]},
+// ── B2 ──
+{id:24,level:'B2',emoji:'🎓',title:'Éducation',exercises:[
+  {type:'qcm',q:'"Scholarship" signifie ?',choices:['Diplôme','Bourse d\'études','Certificat','Inscription'],answer:1,char:'🎓'},
+  {type:'pairs',q:'Associe le vocabulaire académique !',pairs:[['Thesis','Thèse'],['Curriculum','Programme'],['Faculty','Faculté'],['Research','Recherche']]},
+  {type:'fill',q:'She submitted her ___ to the university committee.',blank:'dissertation',hint:'travail académique',hints:['dissertation','painting','contract','recipe']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Critical','thinking','is','essential','in','higher','education'],answer:'Critical thinking is essential in higher education',fr:'La pensée critique est essentielle dans l\'enseignement supérieur'},
+  {type:'qcm',q:'"Peer review" désigne ?',choices:['Examen par les élèves','Évaluation par les pairs','Révision personnelle','Note finale'],answer:1,char:'📝'},
+  {type:'translate',q:'Traduis : "Cette université est reconnue pour ses recherches de pointe"',answer:'this university is renowned for its cutting-edge research',alt:['this university is known for its advanced research'],char:'🏛️'}
+]},
+{id:25,level:'B2',emoji:'💰',title:'Économie & Finance',exercises:[
+  {type:'qcm',q:'"Stock market" signifie ?',choices:['Marché alimentaire','Bourse des valeurs','Marché aux puces','Centre commercial'],answer:1,char:'📊'},
+  {type:'pairs',q:'Associe les termes financiers !',pairs:[['Investment','Investissement'],['Budget','Budget'],['Inflation','Inflation'],['Deficit','Déficit']]},
+  {type:'fill',q:'The company filed for ___ after losing millions.',blank:'bankruptcy',hint:'échec financier',hints:['bankruptcy','success','profit','growth']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Interest','rates','have','risen','significantly','this','year'],answer:'Interest rates have risen significantly this year',fr:'Les taux d\'intérêt ont considérablement augmenté cette année'},
+  {type:'qcm',q:'"Sustainable economy" signifie ?',choices:['Économie rapide','Économie durable','Économie locale','Économie numérique'],answer:1,char:'♻️'},
+  {type:'translate',q:'Traduis : "La récession a touché de nombreux secteurs de l\'économie"',answer:'the recession has affected many sectors of the economy',alt:['the recession impacted many economic sectors'],char:'📉'}
+]},
+{id:26,level:'B2',emoji:'⚖️',title:'Droit & Société',exercises:[
+  {type:'qcm',q:'"Legislation" signifie ?',choices:['Justice','Législation','Constitution','Gouvernement'],answer:1,char:'⚖️'},
+  {type:'pairs',q:'Associe les termes juridiques !',pairs:[['Rights','Droits'],['Law','Loi'],['Court','Tribunal'],['Verdict','Verdict']]},
+  {type:'fill',q:'Everyone has the ___ to a fair trial.',blank:'right',hint:'droit fondamental',hints:['right','privilege','chance','ability']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['The','new','law','aims','to','reduce','inequality'],answer:'The new law aims to reduce inequality',fr:'La nouvelle loi vise à réduire les inégalités'},
+  {type:'qcm',q:'"Freedom of speech" signifie ?',choices:['Liberté de mouvement','Liberté d\'expression','Liberté de religion','Liberté de la presse'],answer:1,char:'🗣️'},
+  {type:'translate',q:'Traduis : "Les droits humains doivent être respectés et protégés"',answer:'human rights must be respected and protected',alt:['human rights need to be respected and protected'],char:'🕊️'}
+]},
+{id:27,level:'B2',emoji:'🔬',title:'Sciences',exercises:[
+  {type:'qcm',q:'"Hypothesis" signifie ?',choices:['Conclusion','Résultat','Hypothèse','Expérience'],answer:2,char:'🧪'},
+  {type:'pairs',q:'Associe les termes scientifiques !',pairs:[['Experiment','Expérience'],['Theory','Théorie'],['Evidence','Preuve'],['Molecule','Molécule']]},
+  {type:'fill',q:'Scientists conduct ___ to test their theories.',blank:'experiments',hint:'méthode scientifique',hints:['experiments','stories','opinions','guesses']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['The','discovery','revolutionised','our','understanding','of','physics'],answer:'The discovery revolutionised our understanding of physics',fr:'La découverte a révolutionné notre compréhension de la physique'},
+  {type:'qcm',q:'"Quantum mechanics" désigne ?',choices:['Mécanique classique','Mécanique quantique','Physique nucléaire','Chimie organique'],answer:1,char:'⚛️'},
+  {type:'translate',q:'Traduis : "Les résultats de l\'étude ont été publiés dans une revue scientifique"',answer:'the results of the study were published in a scientific journal',alt:['the study results were published in a scientific journal'],char:'📓'}
+]},
+{id:28,level:'B2',emoji:'🧠',title:'Psychologie',exercises:[
+  {type:'qcm',q:'"Cognitive bias" désigne ?',choices:['Mémoire parfaite','Biais cognitif','Intelligence naturelle','Comportement rationnel'],answer:1,char:'🧠'},
+  {type:'pairs',q:'Associe les termes psycho !',pairs:[['Perception','Perception'],['Behaviour','Comportement'],['Consciousness','Conscience'],['Motivation','Motivation']]},
+  {type:'fill',q:'___ therapy helps people manage their thoughts.',blank:'Cognitive',hint:'type de thérapie',hints:['Cognitive','Physical','Musical','Dance']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Self-awareness','is','the','foundation','of','emotional','intelligence'],answer:'Self-awareness is the foundation of emotional intelligence',fr:'La conscience de soi est la base de l\'intelligence émotionnelle'},
+  {type:'qcm',q:'"Empathy" signifie ?',choices:['Antipathie','Sympathie générale','Empathie','Indifférence'],answer:2,char:'💝'},
+  {type:'translate',q:'Traduis : "Le stress chronique peut avoir des effets négatifs sur la santé mentale"',answer:'chronic stress can have negative effects on mental health',alt:['chronic stress can negatively affect mental health'],char:'🧘'}
+]},
+{id:29,level:'B2',emoji:'🌐',title:'Mondialisation',exercises:[
+  {type:'qcm',q:'"Globalisation" signifie ?',choices:['Localisation','Mondialisation','Nationalisation','Régionalisation'],answer:1,char:'🌐'},
+  {type:'pairs',q:'Associe les termes mondiaux !',pairs:[['Trade','Commerce'],['Migration','Migration'],['Diplomacy','Diplomatie'],['Alliance','Alliance']]},
+  {type:'fill',q:'International ___ helps countries resolve conflicts peacefully.',blank:'diplomacy',hint:'relations internationales',hints:['diplomacy','warfare','isolation','competition']},
+  {type:'order',q:'Remets dans l\'ordre :',words:['Cultural','exchange','enriches','societies','and','promotes','understanding'],answer:'Cultural exchange enriches societies and promotes understanding',fr:'Les échanges culturels enrichissent les sociétés et favorisent la compréhension'},
+  {type:'qcm',q:'"Multilateral agreement" signifie ?',choices:['Accord bilatéral','Accord national','Accord multilatéral','Accord secret'],answer:2,char:'🤝'},
+  {type:'translate',q:'Traduis : "La coopération internationale est indispensable pour lutter contre le changement climatique"',answer:'international cooperation is essential to fight climate change',alt:['international cooperation is necessary to combat climate change'],char:'🌍'}
+]}
+];
+
+const BADGES = [
+  {id:'first',icon:'⭐',name:'Premier pas !',desc:'Terminer la première leçon',condition:s=>s.lessonsCompleted>=1},
+  {id:'streak3',icon:'🔥',name:'En feu !',desc:'3 jours d\'affilée',condition:s=>s.streak>=3},
+  {id:'xp500',icon:'💎',name:'Collectionneur XP',desc:'Gagner 500 XP',condition:s=>s.totalXP>=500},
+  {id:'perfect',icon:'👑',name:'Perfectionniste',desc:'Terminer une leçon sans erreur',condition:s=>s.perfectLessons>=1},
+  {id:'lessons10',icon:'🎖️',name:'Élève assidu',desc:'Compléter 10 leçons',condition:s=>s.lessonsCompleted>=10},
+  {id:'lessons30',icon:'🏆',name:'Champion !',desc:'Compléter les 30 leçons',condition:s=>s.lessonsCompleted>=30},
+  {id:'xp2000',icon:'🌟',name:'Superstar',desc:'Gagner 2000 XP',condition:s=>s.totalXP>=2000},
+  {id:'streak7',icon:'💥',name:'Semaine parfaite !',desc:'7 jours d\'affilée',condition:s=>s.streak>=7},
+];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let ST = {
+  lessonProgress:{},// lessonId: {stars, xp}
+  totalXP:0,streak:0,lastDate:'',
+  lessonsCompleted:0,perfectLessons:0,
+  earnedBadges:[]
+};
+
+function loadState(){
+  const s=localStorage.getItem('owlenglish');
+  if(s){try{Object.assign(ST,JSON.parse(s));}catch(e){}}
+  updateStreak();
+}
+function saveState(){localStorage.setItem('owlenglish',JSON.stringify(ST));}
+function updateStreak(){
+  const today=new Date().toDateString();
+  if(ST.lastDate===today)return;
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(ST.lastDate===yesterday)ST.streak++;
+  else if(ST.lastDate!==today)ST.streak=1;
+  ST.lastDate=today;
+  saveState();
+}
+
+// ════════════════════════════════════════
+// SCREENS
+// ════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('off'));
+  document.getElementById(id).classList.remove('off');
+  if(id==='home')renderHome();
+  if(id==='profile')renderProfile();
+}
+
+// ════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════
+function renderHome(){
+  // stats
+  const h=document.getElementById('homeStats');
+  h.innerHTML=`
+    <div class="stat-chip"><div class="n">${ST.totalXP}</div><div class="l">XP Total</div></div>
+    <div class="stat-chip"><div class="n">${ST.streak}🔥</div><div class="l">Jours</div></div>
+    <div class="stat-chip"><div class="n">${ST.lessonsCompleted}</div><div class="l">Leçons</div></div>
+    <div class="stat-chip"><div class="n">${ST.earnedBadges.length}</div><div class="l">Badges</div></div>`;
+
+  // levels
+  const levels=['A1','A2','B1','B2'];
+  const colors={A1:'A1',A2:'A2',B1:'B1',B2:'B2'};
+  const levelNames={A1:'Débutant 🌱',A2:'Élémentaire 📚',B1:'Intermédiaire 🚀',B2:'Avancé ⭐'};
+  const wrap=document.getElementById('levelsWrap');
+  wrap.innerHTML='';
+
+  levels.forEach(lv=>{
+    const lessons=LESSONS.filter(l=>l.level===lv);
+    const sec=document.createElement('div');
+    sec.className='level-section';
+    sec.innerHTML=`<div class="level-header level-${lv}">
+      <span class="level-badge bg-${lv}">${lv}</span>
+      <span>${levelNames[lv]}</span>
+    </div>`;
+
+    // path layout: zigzag rows of 3
+    const path=document.createElement('div');path.className='path';
+    for(let i=0;i<lessons.length;i+=3){
+      const row=document.createElement('div');row.className='path-row';
+      const chunk=lessons.slice(i,i+3);
+      chunk.forEach(ls=>{
+        const prog=ST.lessonProgress[ls.id];
+        const prev=ls.id===0||ST.lessonProgress[ls.id-1]||ls.level!==LESSONS[ls.id>0?ls.id-1:0].level;
+        // unlock logic: first of each level or previous done
+        let unlocked=false;
+        if(ls.id===0)unlocked=true;
+        else if(LESSONS[ls.id-1]&&LESSONS[ls.id-1].level===lv){
+          unlocked=!!ST.lessonProgress[ls.id-1];
+        } else {
+          // first of this level: check if previous level has at least 50% done
+          const prevLevelIdx=levels.indexOf(lv)-1;
+          if(prevLevelIdx<0)unlocked=true;
+          else{
+            const prevLv=levels[prevLevelIdx];
+            const prevLessons=LESSONS.filter(l=>l.level===prevLv);
+            const prevDone=prevLessons.filter(l=>ST.lessonProgress[l.id]).length;
+            unlocked=prevDone>=Math.ceil(prevLessons.length/2);
+          }
+        }
+        const state=prog?'done':(unlocked?'active':'locked');
+        const stars=prog?prog.stars:0;
+        const xp=prog?prog.xp:0;
+        const node=document.createElement('div');
+        node.className='lesson-node';
+        node.innerHTML=`<div class="node-circle node-${state}">
+          <span style="font-size:26px">${ls.emoji}</span>
+          ${state==='done'?`<div class="node-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>`:''}
+          ${state==='active'?'<div style="position:absolute;top:-8px;right:-6px;background:var(--green);color:white;font-size:9px;font-weight:800;padding:2px 6px;border-radius:100px;border:2px solid white">START</div>':''}
+        </div>
+        <div class="node-label">${ls.title}</div>`;
+        if(unlocked)node.onclick=()=>startLesson(ls.id);
+        row.appendChild(node);
+      });
+      path.appendChild(row);
+    }
+    sec.appendChild(path);
+    wrap.appendChild(sec);
+  });
+}
+
+// ════════════════════════════════════════
+// LESSON ENGINE
+// ════════════════════════════════════════
+let CL={lesson:null,exIdx:0,hearts:3,xp:0,errors:0,answered:false,
+  wordSlots:[],wordBank:[],pairLeft:null,pairMatched:[]};
+
+function startLesson(id){
+  CL.lesson=LESSONS[id];
+  CL.exIdx=0;CL.hearts=3;CL.xp=0;CL.errors=0;CL.answered=false;
+  showScreen('lesson');
+  renderExercise();
+}
+
+function closeLesson(){showScreen('home');}
+
+function renderExercise(){
+  const ex=CL.lesson.exercises[CL.exIdx];
+  const pct=Math.round((CL.exIdx/CL.lesson.exercises.length)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+
+  // hearts
+  let hh='';for(let i=0;i<3;i++)hh+=`<span class="heart${i>=CL.hearts?' lost':''}">❤️</span>`;
+  document.getElementById('heartsDisplay').innerHTML=hh;
+
+  document.getElementById('feedbackBar').style.display='none';
+  document.getElementById('checkWrap').style.display='block';
+
+  CL.answered=false;
+  CL.pairLeft=null;
+  CL.pairMatched=[];
+
+  const wrap=document.getElementById('exerciseWrap');
+  wrap.innerHTML='';
+
+  const typeLabels={qcm:'Choix multiple',fill:'Complète la phrase',order:'Remet dans l\'ordre',pairs:'Associe les paires',translate:'Traduis'};
+  wrap.innerHTML=`<div class="ex-type-badge">${typeLabels[ex.type]||ex.type}</div>`;
+
+  if(ex.char){
+    const ch=document.createElement('div');ch.className='character';ch.textContent=ex.char;
+    wrap.appendChild(ch);
+  }
+
+  const qEl=document.createElement('div');
+  qEl.className='ex-question';qEl.textContent=ex.q;
+  wrap.appendChild(qEl);
+
+  if(ex.type==='qcm') renderQCM(ex,wrap);
+  else if(ex.type==='fill') renderFill(ex,wrap);
+  else if(ex.type==='order') renderOrder(ex,wrap);
+  else if(ex.type==='pairs') renderPairs(ex,wrap);
+  else if(ex.type==='translate') renderTranslate(ex,wrap);
+
+  setCheckBtn(false);
+}
+
+function renderQCM(ex,wrap){
+  const div=document.createElement('div');div.className='choices';
+  const letters=['A','B','C','D'];
+  ex.choices.forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='choice-btn';
+    btn.innerHTML=`<span class="choice-letter">${letters[i]}</span>${c}`;
+    btn.onclick=()=>{
+      if(CL.answered)return;
+      wrap.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      CL._selected=i;
+      setCheckBtn(true);
+    };
+    div.appendChild(btn);
+  });
+  wrap.appendChild(div);
+}
+
+function renderFill(ex,wrap){
+  const hintEl=document.createElement('div');
+  hintEl.className='ex-hint';hintEl.textContent='💡 Indice : '+ex.hint;
+  wrap.appendChild(hintEl);
+
+  const sent=ex.q.replace('___',`<input class="blank-input" id="blankIn" type="text" autocomplete="off" spellcheck="false" placeholder="???" />`);
+  const sd=document.createElement('div');sd.className='sentence-display';sd.innerHTML=sent;
+  wrap.appendChild(sd);
+
+  const hw=document.createElement('div');hw.className='hint-words';
+  const shuffled=[...ex.hints].sort(()=>Math.random()-.5);
+  shuffled.forEach(w=>{
+    const btn=document.createElement('button');btn.className='hint-word';btn.textContent=w;
+    btn.onclick=()=>{
+      if(CL.answered)return;
+      document.getElementById('blankIn').value=w;
+      setCheckBtn(true);
+    };
+    hw.appendChild(btn);
+  });
+  wrap.appendChild(hw);
+
+  setTimeout(()=>{
+    const inp=document.getElementById('blankIn');
+    if(inp){inp.oninput=()=>setCheckBtn(inp.value.trim().length>0);}
+  },50);
+}
+
+function renderOrder(ex,wrap){
+  const hintEl=document.createElement('div');
+  hintEl.className='ex-hint';hintEl.textContent='🇫🇷 '+ex.fr;
+  wrap.appendChild(hintEl);
+
+  const slots=document.createElement('div');slots.id='wordSlots';slots.className='word-slots';
+  wrap.appendChild(slots);
+
+  const bank=document.createElement('div');bank.id='wordBank';bank.className='word-bank';
+  CL.wordSlots=[];
+  CL.wordBank=[...ex.words].sort(()=>Math.random()-.5);
+  CL.wordBank.forEach((w,i)=>{
+    const chip=document.createElement('div');
+    chip.className='word-chip';chip.textContent=w;chip.dataset.idx=i;
+    chip.onclick=()=>moveToSlot(i,chip);
+    bank.appendChild(chip);
+  });
+  wrap.appendChild(bank);
+}
+
+function moveToSlot(bankIdx,chip){
+  if(CL.answered)return;
+  if(chip.classList.contains('disabled'))return;
+  chip.classList.add('disabled');
+  const slots=document.getElementById('wordSlots');
+  const newChip=document.createElement('div');
+  newChip.className='word-chip placed';
+  newChip.textContent=chip.textContent;
+  newChip.dataset.bankIdx=bankIdx;
+  newChip.onclick=()=>{
+    if(CL.answered)return;
+    newChip.remove();
+    chip.classList.remove('disabled');
+    updateSlots();
+  };
+  slots.appendChild(newChip);
+  updateSlots();
+}
+
+function updateSlots(){
+  const slots=document.getElementById('wordSlots');
+  if(!slots)return;
+  setCheckBtn(slots.children.length>0);
+}
+
+function renderPairs(ex,wrap){
+  const shuffLeft=[...ex.pairs].sort(()=>Math.random()-.5).map(p=>p[0]);
+  const shuffRight=[...ex.pairs].sort(()=>Math.random()-.5).map(p=>p[1]);
+  const grid=document.createElement('div');grid.className='pairs-grid';
+
+  const leftBtns=[],rightBtns=[];
+  shuffLeft.forEach((w,i)=>{
+    const btn=document.createElement('button');btn.className='pair-btn';btn.textContent=w;
+    btn.dataset.word=w;btn.dataset.side='left';
+    btn.onclick=()=>selectPair(btn,'left');
+    leftBtns.push(btn);grid.appendChild(btn);
+  });
+  shuffRight.forEach((w,i)=>{
+    const btn=document.createElement('button');btn.className='pair-btn';btn.textContent=w;
+    btn.dataset.word=w;btn.dataset.side='right';
+    btn.onclick=()=>selectPair(btn,'right');
+    rightBtns.push(btn);grid.appendChild(btn);
+  });
+  // reorder for 2-column display
+  grid.innerHTML='';
+  for(let i=0;i<shuffLeft.length;i++){
+    grid.appendChild(leftBtns[i]);grid.appendChild(rightBtns[i]);
+  }
+  wrap.appendChild(grid);
+  CL._pairsData=ex.pairs;
+}
+
+function selectPair(btn,side){
+  if(CL.answered)return;
+  if(btn.classList.contains('matched'))return;
+  if(side==='left'){
+    document.querySelectorAll('.pair-btn').forEach(b=>{if(b.dataset.side==='left')b.classList.remove('sel-left');});
+    btn.classList.add('sel-left');
+    CL.pairLeft=btn;
+  } else {
+    if(!CL.pairLeft)return;
+    const left=CL.pairLeft.dataset.word;
+    const right=btn.dataset.word;
+    const match=CL._pairsData.find(p=>p[0]===left&&p[1]===right);
+    if(match){
+      CL.pairLeft.classList.remove('sel-left');
+      CL.pairLeft.classList.add('matched');
+      btn.classList.add('matched');
+      CL.pairMatched.push(left);
+      CL.pairLeft=null;
+      if(CL.pairMatched.length===CL._pairsData.length){
+        CL.answered=true;
+        setTimeout(()=>showFeedback(true,'Parfait ! Toutes les paires trouvées !'),400);
+        return;
+      }
+    } else {
+      btn.classList.add('wrong-flash');
+      CL.pairLeft.classList.add('wrong-flash');
+      setTimeout(()=>{btn.classList.remove('wrong-flash');CL.pairLeft&&CL.pairLeft.classList.remove('wrong-flash','sel-left');CL.pairLeft=null;},600);
+      loseHeart();
+    }
+  }
+}
+
+function renderTranslate(ex,wrap){
+  const ta=document.createElement('textarea');
+  ta.className='trans-input';ta.placeholder='Écris ta traduction en anglais…';
+  ta.id='transInput';ta.autocomplete='off';ta.spellcheck=false;
+  ta.oninput=()=>setCheckBtn(ta.value.trim().length>0);
+  wrap.appendChild(ta);
+  setTimeout(()=>ta.focus(),100);
+}
+
+// ── CHECK ──
+function setCheckBtn(ready){
+  const btn=document.getElementById('checkBtn');
+  btn.classList.toggle('ready',ready);
+}
+
+function checkAnswer(){
+  if(CL.answered)return;
+  const ex=CL.lesson.exercises[CL.exIdx];
+
+  if(ex.type==='qcm'){
+    if(CL._selected===undefined)return;
+    const correct=CL._selected===ex.answer;
+    document.querySelectorAll('.choice-btn').forEach((b,i)=>{
+      if(i===ex.answer)b.classList.add('correct');
+      else if(i===CL._selected&&!correct)b.classList.add('wrong');
+    });
+    CL.answered=true;
+    showFeedback(correct,correct?'Excellent !':`La bonne réponse : "${ex.choices[ex.answer]}"`);
+
+  } else if(ex.type==='fill'){
+    const inp=document.getElementById('blankIn');
+    if(!inp||!inp.value.trim())return;
+    const correct=inp.value.trim().toLowerCase()===ex.blank.toLowerCase();
+    inp.classList.add(correct?'correct':'wrong');
+    CL.answered=true;
+    showFeedback(correct,correct?'Parfait !':`La bonne réponse : "${ex.blank}"`);
+
+  } else if(ex.type==='order'){
+    const slots=document.getElementById('wordSlots');
+    if(!slots||!slots.children.length)return;
+    const answer=Array.from(slots.children).map(c=>c.textContent).join(' ');
+    const correct=answer.toLowerCase()===ex.answer.toLowerCase();
+    Array.from(slots.children).forEach(c=>c.classList.add(correct?'correct-chip':'wrong-chip'));
+    CL.answered=true;
+    showFeedback(correct,correct?'Bravo !':`La bonne réponse : "${ex.answer}"`);
+
+  } else if(ex.type==='translate'){
+    const inp=document.getElementById('transInput');
+    if(!inp||!inp.value.trim())return;
+    const val=inp.value.trim().toLowerCase().replace(/[!?.,]/g,'');
+    const correct=val===ex.answer.toLowerCase()||((ex.alt||[]).some(a=>val===a.toLowerCase()));
+    inp.classList.add(correct?'correct':'wrong');
+    CL.answered=true;
+    showFeedback(correct,correct?'Excellent !':`Réponse correcte : "${ex.answer}"`);
+  }
+}
+
+function showFeedback(correct, msg){
+  triggerFlash(correct?'green':'red');
+  if(!correct)loseHeart();
+  const xpEarned=correct?10:0;
+  if(correct){CL.xp+=xpEarned;showXPBurst(xpEarned);}
+
+  const bar=document.getElementById('feedbackBar');
+  bar.className='feedback-bar '+(correct?'fb-correct':'fb-wrong');
+  bar.style.display='flex';
+  bar.innerHTML=`<div class="fb-title">${correct?'✅ Correct !':'❌ Incorrect'}</div>
+    <div class="fb-answer">${msg}</div>
+    <button class="btn-continue" onclick="nextExercise()">${CL.exIdx<CL.lesson.exercises.length-1?'CONTINUER →':'TERMINER →'}</button>`;
+  document.getElementById('checkWrap').style.display='none';
+}
+
+function loseHeart(){
+  CL.errors++;
+  if(CL.hearts>0)CL.hearts--;
+  let hh='';for(let i=0;i<3;i++)hh+=`<span class="heart${i>=CL.hearts?' lost':''}">❤️</span>`;
+  document.getElementById('heartsDisplay').innerHTML=hh;
+}
+
+function nextExercise(){
+  CL.exIdx++;
+  if(CL.exIdx>=CL.lesson.exercises.length){
+    completeLesson();
+  } else {
+    renderExercise();
+  }
+}
+
+// ════════════════════════════════════════
+// COMPLETE
+// ════════════════════════════════════════
+function completeLesson(){
+  const stars=CL.errors===0?3:CL.errors<=2?2:1;
+  const xp=CL.xp+(stars*20);
+  const id=CL.lesson.id;
+
+  const prev=ST.lessonProgress[id];
+  if(!prev||prev.stars<stars){
+    ST.lessonProgress[id]={stars,xp};
+  }
+  if(!prev)ST.lessonsCompleted++;
+  if(stars===3&&(!prev||prev.stars<3))ST.perfectLessons++;
+  ST.totalXP+=xp;
+  saveState();
+
+  // check badges
+  checkBadges();
+
+  document.getElementById('trophyEmoji').textContent=stars===3?'🏆':stars===2?'🥈':'🥉';
+  document.getElementById('completeTitle').textContent=stars===3?'Parfait !':stars===2?'Bien joué !':'Continue !';
+  document.getElementById('completeSub').textContent=`Leçon "${CL.lesson.title}" terminée`;
+  document.getElementById('completeStats').innerHTML=`
+    <div class="c-stat"><div class="n">+${xp}</div><div class="l">XP Gagné</div></div>
+    <div class="c-stat"><div class="n">${'⭐'.repeat(stars)}</div><div class="l">Étoiles</div></div>
+    <div class="c-stat"><div class="n">${CL.errors}</div><div class="l">Erreurs</div></div>`;
+  showScreen('complete');
+}
+
+function finishLesson(){showScreen('home');}
+
+// ════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════
+function renderProfile(){
+  const levels=['A1','A2','B1','B2'];
+  const levelNames={A1:'Débutant',A2:'Élémentaire',B1:'Intermédiaire',B2:'Avancé'};
+  let currentLevel='A1';
+  for(const lv of levels){
+    const ls=LESSONS.filter(l=>l.level===lv);
+    if(ls.filter(l=>ST.lessonProgress[l.id]).length>=Math.ceil(ls.length/2))currentLevel=lv;
+  }
+  document.getElementById('profileLevel').textContent=`Niveau ${currentLevel} • ${levelNames[currentLevel]}`;
+
+  const body=document.getElementById('profileBody');
+  body.innerHTML=`
+    <span class="streak-fire">🔥</span>
+    <div class="streak-count">${ST.streak}</div>
+    <div class="streak-label">jours de série consécutifs</div>
+
+    <div class="profile-section-title">Progression par niveau</div>
+    ${levels.map(lv=>{
+      const ls=LESSONS.filter(l=>l.level===lv);
+      const done=ls.filter(l=>ST.lessonProgress[l.id]).length;
+      const pct=Math.round((done/ls.length)*100);
+      return `<div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px">
+          <span><span class="level-badge bg-${lv}" style="font-size:10px;padding:2px 7px">${lv}</span> ${levelNames[lv]}</span>
+          <span>${done}/${ls.length} leçons</span>
+        </div>
+        <div style="height:10px;background:var(--border);border-radius:100px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:var(--green);border-radius:100px;transition:width .6s"></div>
+        </div>
+      </div>`;
+    }).join('')}
+
+    <div class="profile-section-title">Badges (${ST.earnedBadges.length}/${BADGES.length})</div>
+    <div class="badges-grid">
+      ${BADGES.map(b=>`<div class="badge-card ${ST.earnedBadges.includes(b.id)?'earned':''}">
+        <div class="bi">${b.icon}</div>
+        <div class="bt">${b.name}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="profile-section-title">Statistiques</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div class="stat-chip"><div class="n" style="font-size:28px">${ST.totalXP}</div><div class="l">XP Total</div></div>
+      <div class="stat-chip"><div class="n" style="font-size:28px">${ST.lessonsCompleted}</div><div class="l">Leçons finies</div></div>
+      <div class="stat-chip"><div class="n" style="font-size:28px">${ST.perfectLessons}</div><div class="l">Leçons parfaites</div></div>
+      <div class="stat-chip"><div class="n" style="font-size:28px">${ST.earnedBadges.length}</div><div class="l">Badges</div></div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// BADGES
+// ════════════════════════════════════════
+function checkBadges(){
+  BADGES.forEach(b=>{
+    if(!ST.earnedBadges.includes(b.id)&&b.condition(ST)){
+      ST.earnedBadges.push(b.id);
+      saveState();
+      setTimeout(()=>showBadge(b),800);
+    }
+  });
+}
+
+function showBadge(b){
+  document.getElementById('badgeIcon').textContent=b.icon;
+  document.getElementById('badgeName').textContent=b.name;
+  document.getElementById('badgeDesc').textContent=b.desc;
+  document.getElementById('badgePopup').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeBadge(){
+  document.getElementById('badgePopup').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════
+// FX
+// ════════════════════════════════════════
+function triggerFlash(color){
+  const f=document.getElementById('flash');
+  f.className='flash '+color;
+  f.style.opacity='1';
+  setTimeout(()=>f.style.opacity='0',200);
+}
+
+function showXPBurst(xp){
+  const el=document.createElement('div');
+  el.className='xp-burst';el.textContent='+'+xp+' XP';
+  el.style.cssText='position:fixed;top:40%;left:50%;transform:translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+
+// ════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════
+loadState();
+renderHome();
+</script>
+</body>
+</html>
